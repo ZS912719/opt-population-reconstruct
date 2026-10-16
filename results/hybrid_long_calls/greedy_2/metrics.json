@@ -1,0 +1,71 @@
+{
+  "parameters": {
+    "method": "greedy",
+    "seed": 2,
+    "seconds": 65.0,
+    "restarts": 2,
+    "backtracks": 1000,
+    "top": 8,
+    "alpha": 1,
+    "beta": 1,
+    "capacity": false,
+    "exact": true,
+    "exact_at": 300,
+    "exact_seconds": 55.0,
+    "rollback": 500
+  },
+  "backtracks": 200,
+  "restarts": 0,
+  "exact_calls": [
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.11792359999890323,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "highs_version": "bundled with scipy; not exposed by public scipy API",
+      "prefix_length": 200
+    },
+    {
+      "status": "linear_objective_optimal",
+      "solver_status": 0,
+      "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "seconds": 49.3948292999994,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "highs_version": "bundled with scipy; not exposed by public scipy API",
+      "feasible_incumbent": true,
+      "prefix_length": 0
+    }
+  ],
+  "exact_seconds": 49.512752899998304,
+  "termination_status": "success_independently_verified",
+  "solve_seconds": 51.49691789999997,
+  "population_size": 500,
+  "constraints": 729,
+  "violated_constraints": 0,
+  "total_absolute_error": 0,
+  "max_absolute_error": 0,
+  "distinct_personas": 135,
+  "duplicate_people": 365,
+  "max_persona_multiplicity": 49,
+  "shannon_entropy_nats": 4.185341333500056,
+  "success": true,
+  "preprocessing_seconds": 0.6765154000022449,
+  "load_seconds": 0.04024760000174865,
+  "candidate_seconds": 0.6362678000004962,
+  "candidate_count": 11453,
+  "memory_bytes": {
+    "x": 137436,
+    "match": 1030770,
+    "offset": 5840,
+    "reverse": 2061540
+  },
+  "python_version": "3.12.7",
+  "numpy_version": "1.26.4",
+  "necessary_consistency_checks_passed": true,
+  "global_feasibility_proven_by_prechecks": false
+}

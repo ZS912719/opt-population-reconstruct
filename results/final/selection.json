@@ -1,0 +1,6 @@
+{
+  "criterion": "highest observed Shannon entropy among independently verified runs",
+  "source": "results\\hybrid\\greedy_1",
+  "max_distinct_personas_source": "results\\hybrid\\greedy_0",
+  "global_optimality_proven": false
+}

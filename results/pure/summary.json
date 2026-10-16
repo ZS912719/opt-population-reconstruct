@@ -1,0 +1,41 @@
+{
+  "parameters": {
+    "command": "experiment",
+    "data": "data",
+    "out": "results/pure",
+    "population": null,
+    "k": 12,
+    "n": 500,
+    "method": "greedy",
+    "seed": 0,
+    "seeds": "0,1,2",
+    "seconds": 12.0,
+    "restarts": 2,
+    "backtracks": 100,
+    "top": 8,
+    "alpha": 1,
+    "beta": 1,
+    "exact_at": 100,
+    "exact_seconds": 10,
+    "rollback": 25,
+    "exact": false,
+    "capacity": false
+  },
+  "shared_preprocessing_seconds": 0.6177447000009124,
+  "results": {
+    "random": {
+      "runs": 3,
+      "successful_runs": 0,
+      "success_rate": 0.0,
+      "feasible_mean_distinct_personas": null,
+      "feasible_mean_entropy_nats": null
+    },
+    "greedy": {
+      "runs": 3,
+      "successful_runs": 0,
+      "success_rate": 0.0,
+      "feasible_mean_distinct_personas": null,
+      "feasible_mean_entropy_nats": null
+    }
+  }
+}

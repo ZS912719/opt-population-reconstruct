@@ -1,0 +1,18 @@
+{
+  "N": 500,
+  "attributes": 12,
+  "tables": 45,
+  "constraints": 729,
+  "arity_counts": {
+    "1": 12,
+    "2": 20,
+    "3": 10,
+    "4": 3
+  },
+  "zero_target_cells": 270,
+  "enumerated_personas": 531441,
+  "retained_candidates": 11453,
+  "sum_initial_candidate_upper_bounds": 21061,
+  "max_initial_candidate_upper_bound": 78,
+  "prechecks_prove_global_feasibility": false
+}

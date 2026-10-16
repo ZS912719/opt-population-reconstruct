@@ -1,0 +1,168 @@
+{
+  "parameters": {
+    "method": "random",
+    "seed": 0,
+    "seconds": 60.0,
+    "restarts": 2,
+    "backtracks": 1000,
+    "top": 8,
+    "alpha": 1,
+    "beta": 1,
+    "capacity": false,
+    "exact": true,
+    "exact_at": 300,
+    "exact_seconds": 8.0,
+    "rollback": 75
+  },
+  "backtracks": 134,
+  "restarts": 0,
+  "exact_calls": [
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.5273353000011411,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 17
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 8.92977350000001,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 0
+    },
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.017820399996708147,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 35
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 11.75750600000174,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 1
+    },
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.027985499997157604,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 17
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 11.599400099999912,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 1
+    },
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.025161400000797585,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 29
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 11.275597699997888,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 1
+    },
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.04630639999959385,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 13
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 11.191678899998806,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 1
+    },
+    {
+      "status": "infeasible",
+      "solver_status": 2,
+      "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is At lower/fixed bound)",
+      "seconds": 0.03634000000238302,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 23
+    },
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is At lower/fixed bound)",
+      "seconds": 5.003802600000199,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "prefix_length": 1
+    }
+  ],
+  "exact_seconds": 60.43870779999634,
+  "termination_status": "time_limit",
+  "solve_seconds": 61.53797850000046,
+  "population_size": 35,
+  "constraints": 729,
+  "violated_constraints": 411,
+  "total_absolute_error": 20925,
+  "max_absolute_error": 458,
+  "distinct_personas": 35,
+  "duplicate_people": 0,
+  "max_persona_multiplicity": 1,
+  "shannon_entropy_nats": 3.5553480614894135,
+  "success": false,
+  "preprocessing_seconds": 0.6324846000024991,
+  "load_seconds": 0.040850400000636,
+  "candidate_seconds": 0.5916342000018631,
+  "candidate_count": 11453,
+  "memory_bytes": {
+    "x": 137436,
+    "match": 1030770,
+    "offset": 5840,
+    "reverse": 2061540
+  },
+  "python_version": "3.12.7",
+  "numpy_version": "1.26.4",
+  "necessary_consistency_checks_passed": true,
+  "global_feasibility_proven_by_prechecks": false
+}

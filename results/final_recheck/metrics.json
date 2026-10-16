@@ -1,0 +1,12 @@
+{
+  "population_size": 500,
+  "constraints": 729,
+  "violated_constraints": 0,
+  "total_absolute_error": 0,
+  "max_absolute_error": 0,
+  "distinct_personas": 191,
+  "duplicate_people": 309,
+  "max_persona_multiplicity": 24,
+  "shannon_entropy_nats": 4.717455424726461,
+  "success": true
+}

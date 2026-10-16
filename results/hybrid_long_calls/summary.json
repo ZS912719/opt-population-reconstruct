@@ -1,0 +1,41 @@
+{
+  "parameters": {
+    "command": "experiment",
+    "data": "data",
+    "out": "results/hybrid_long_calls",
+    "population": null,
+    "k": 12,
+    "n": 500,
+    "method": "greedy",
+    "seed": 0,
+    "seeds": "0,1,2",
+    "seconds": 65.0,
+    "restarts": 2,
+    "backtracks": 1000,
+    "top": 8,
+    "alpha": 1,
+    "beta": 1,
+    "exact_at": 300,
+    "exact_seconds": 55.0,
+    "rollback": 500,
+    "exact": true,
+    "capacity": false
+  },
+  "shared_preprocessing_seconds": 0.6765154000022449,
+  "results": {
+    "random": {
+      "runs": 3,
+      "successful_runs": 3,
+      "success_rate": 1.0,
+      "feasible_mean_distinct_personas": 137.33333333333334,
+      "feasible_mean_entropy_nats": 4.046570974754079
+    },
+    "greedy": {
+      "runs": 3,
+      "successful_runs": 3,
+      "success_rate": 1.0,
+      "feasible_mean_distinct_personas": 137.33333333333334,
+      "feasible_mean_entropy_nats": 4.140113744900287
+    }
+  }
+}

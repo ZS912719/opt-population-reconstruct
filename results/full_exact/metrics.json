@@ -1,0 +1,59 @@
+{
+  "parameters": {
+    "method": "greedy",
+    "seed": 0,
+    "seconds": 45.0,
+    "restarts": 2,
+    "backtracks": 100,
+    "top": 8,
+    "alpha": 1,
+    "beta": 1,
+    "capacity": false,
+    "exact": true,
+    "exact_at": 500,
+    "exact_seconds": 40.0,
+    "rollback": 25
+  },
+  "backtracks": 0,
+  "restarts": 0,
+  "exact_calls": [
+    {
+      "status": "limit_or_unknown",
+      "solver_status": 1,
+      "message": "Time limit reached. (HiGHS Status 13: Time limit reached)",
+      "seconds": 40.76939829999901,
+      "scipy_version": "1.13.1",
+      "solver": "HiGHS bundled with SciPy",
+      "diversity_optimality_proven": false,
+      "feasible_incumbent": true,
+      "prefix_length": 0
+    }
+  ],
+  "exact_seconds": 40.76939829999901,
+  "termination_status": "success_independently_verified",
+  "solve_seconds": 40.786341600000014,
+  "population_size": 500,
+  "constraints": 729,
+  "violated_constraints": 0,
+  "total_absolute_error": 0,
+  "max_absolute_error": 0,
+  "distinct_personas": 138,
+  "duplicate_people": 362,
+  "max_persona_multiplicity": 60,
+  "shannon_entropy_nats": 3.9810209016009086,
+  "success": true,
+  "preprocessing_seconds": 0.5146824000003107,
+  "load_seconds": 0.040140199998859316,
+  "candidate_seconds": 0.4745422000014514,
+  "candidate_count": 11453,
+  "memory_bytes": {
+    "x": 137436,
+    "match": 1030770,
+    "offset": 5840,
+    "reverse": 2061540
+  },
+  "python_version": "3.12.7",
+  "numpy_version": "1.26.4",
+  "necessary_consistency_checks_passed": true,
+  "global_feasibility_proven_by_prechecks": false
+}

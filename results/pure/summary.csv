@@ -1,0 +1,7 @@
+method,seed,success,population_size,violated_constraints,total_absolute_error,max_absolute_error,distinct_personas,duplicate_people,max_persona_multiplicity,shannon_entropy_nats,preprocessing_seconds,solve_seconds,backtracks,restarts,exact_seconds,termination_status
+random,0,False,135,368,16425,361,128,7,2,4.833392848602584,0.6177447000009124,1.8174437000016042,100,2,0.0,dead_end_or_backtrack_budget
+random,1,False,161,350,15255,335,151,10,4,4.986688601181241,0.6177447000009124,2.161572900000465,100,2,0.0,dead_end_or_backtrack_budget
+random,2,False,183,352,14265,313,169,14,3,5.100571567052115,0.6177447000009124,2.367934599998989,100,2,0.0,dead_end_or_backtrack_budget
+greedy,0,False,287,395,9585,206,143,144,25,4.438018364420577,0.6177447000009124,12.005964699998003,100,2,0.0,time_limit
+greedy,1,False,287,395,9585,206,143,144,25,4.438018364420577,0.6177447000009124,10.986521599999833,100,2,0.0,dead_end_or_backtrack_budget
+greedy,2,False,307,384,8685,186,161,146,25,4.583537496956268,0.6177447000009124,12.000821999998152,100,2,0.0,time_limit

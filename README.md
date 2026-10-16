@@ -156,7 +156,7 @@ The default delivered population is in [results/final/](results/final/). It has 
 
 In the main hybrid experiment, feasible greedy results averaged D=191.333333 and H=4.673141. With longer calls and full rollback, both methods averaged D=137.333333; random H averaged 4.046571 and greedy H averaged 4.140114. No global diversity or entropy optimum is claimed.
 
-Full commands, per-seed metrics, and limitations are preserved in [EXPERIMENTS.md](EXPERIMENTS.md), currently in Chinese, and the machine-readable summaries under [results/](results/). `python scripts/report.py` rechecks the three recorded experiment groups, regenerates that report, and selects the observed highest-entropy feasible run for `results/final/`. It expects the delivered directory layout and updates those report and selection artifacts.
+Full commands, per-seed metrics, and limitations are preserved in [EXPERIMENTS.md](EXPERIMENTS.md) and the machine-readable summaries under [results/](results/). `python scripts/report.py` rechecks the three recorded experiment groups, regenerates that report in English, and selects the observed highest-entropy feasible run for `results/final/`. It expects the delivered directory layout and updates those report and selection artifacts.
 
 ## Project layout and contribution language
 

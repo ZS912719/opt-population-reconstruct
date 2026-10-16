@@ -1,20 +1,20 @@
-# 实际运行报告
+# Recorded Experiment Report
 
-运行日期：2026-10-06。Python 3.12.7，NumPy 1.26.4，SciPy 1.13.1。
+Experiment date: 2026-10-06. Python 3.12.7, NumPy 1.26.4, SciPy 1.13.1.
 
-通过 HiGHS 的 disp 日志另行核实，当前环境捆绑的 HiGHS 版本为 1.2.0。
+HiGHS diagnostic output, enabled separately with disp, confirmed bundled HiGHS version 1.2.0 in the experiment environment.
 
-数据零目标筛选后有 11,453 个候选，与研究附件第 15 页的活跃 persona 数量一致。数据检查只是必要条件。
+Zero-target filtering retains 11,453 candidates, matching the active persona count on page 15 of the research attachment. Input consistency checks are necessary conditions only.
 
 ## pure
 
-完整命令：
+Full command:
 
 ```powershell
 python -m synthpop experiment --seeds 0,1,2 --seconds 12.0 --restarts 2 --backtracks 100 --out results/pure
 ```
 
-| 方法 | 种子 | 成功 | 人数 | 不满足约束 | L1误差 | 最大误差 | D（仅可行） | H（仅可行） | 求解秒 | 撤销人数 | 重启 | 补全秒 |
+| Method | Seed | Success | Population | Violated constraints | L1 error | Max error | D (feasible only) | H (feasible only) | Solve seconds | Individuals undone | Restarts | Exact seconds |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | random | 0 | False | 135 | 368 | 16425 | 361 | - | - | 1.817 | 100 | 2 | 0.000 |
 | random | 1 | False | 161 | 350 | 15255 | 335 | - | - | 2.162 | 100 | 2 | 0.000 |
@@ -23,20 +23,20 @@ python -m synthpop experiment --seeds 0,1,2 --seconds 12.0 --restarts 2 --backtr
 | greedy | 1 | False | 287 | 395 | 9585 | 206 | - | - | 10.987 | 100 | 2 | 0.000 |
 | greedy | 2 | False | 307 | 384 | 8685 | 186 | - | - | 12.001 | 100 | 2 | 0.000 |
 
-共享预处理：0.6177 秒（每次实验只执行一次）。
+Shared preprocessing: 0.6177 seconds (performed once per experiment).
 
-- random 成功率：0/3；可行结果 D 均值=None，H 均值=None。
-- greedy 成功率：0/3；可行结果 D 均值=None，H 均值=None。
+- random success rate: 0/3; feasible-only mean D=None, mean H=None.
+- greedy success rate: 0/3; feasible-only mean D=None, mean H=None.
 
 ## hybrid
 
-完整命令：
+Full command:
 
 ```powershell
 python -m synthpop experiment --seeds 0,1,2 --seconds 60.0 --restarts 2 --backtracks 1000 --out results/hybrid --exact --exact-at 300 --exact-seconds 8.0 --rollback 75
 ```
 
-| 方法 | 种子 | 成功 | 人数 | 不满足约束 | L1误差 | 最大误差 | D（仅可行） | H（仅可行） | 求解秒 | 撤销人数 | 重启 | 补全秒 |
+| Method | Seed | Success | Population | Violated constraints | L1 error | Max error | D (feasible only) | H (feasible only) | Solve seconds | Individuals undone | Restarts | Exact seconds |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | random | 0 | False | 35 | 411 | 20925 | 458 | - | - | 61.538 | 134 | 0 | 60.439 |
 | random | 1 | False | 52 | 398 | 20160 | 443 | - | - | 62.370 | 192 | 0 | 60.881 |
@@ -45,20 +45,20 @@ python -m synthpop experiment --seeds 0,1,2 --seconds 60.0 --restarts 2 --backtr
 | greedy | 1 | True | 500 | 0 | 0 | 0 | 191 | 4.717455 | 15.787 | 150 | 0 | 12.368 |
 | greedy | 2 | True | 500 | 0 | 0 | 0 | 190 | 4.637186 | 16.532 | 150 | 0 | 13.253 |
 
-共享预处理：0.6325 秒（每次实验只执行一次）。
+Shared preprocessing: 0.6325 seconds (performed once per experiment).
 
-- random 成功率：0/3；可行结果 D 均值=None，H 均值=None。
-- greedy 成功率：3/3；可行结果 D 均值=191.33333333333334，H 均值=4.67314145209518。
+- random success rate: 0/3; feasible-only mean D=None, mean H=None.
+- greedy success rate: 3/3; feasible-only mean D=191.33333333333334, mean H=4.67314145209518.
 
 ## hybrid_long_calls
 
-完整命令：
+Full command:
 
 ```powershell
 python -m synthpop experiment --seeds 0,1,2 --seconds 65.0 --restarts 2 --backtracks 1000 --out results/hybrid_long_calls --exact --exact-at 300 --exact-seconds 55.0 --rollback 500
 ```
 
-| 方法 | 种子 | 成功 | 人数 | 不满足约束 | L1误差 | 最大误差 | D（仅可行） | H（仅可行） | 求解秒 | 撤销人数 | 重启 | 补全秒 |
+| Method | Seed | Success | Population | Violated constraints | L1 error | Max error | D (feasible only) | H (feasible only) | Solve seconds | Individuals undone | Restarts | Exact seconds |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | random | 0 | True | 500 | 0 | 0 | 0 | 137 | 4.079469 | 55.838 | 17 | 0 | 55.650 |
 | random | 1 | True | 500 | 0 | 0 | 0 | 139 | 4.147284 | 55.449 | 31 | 0 | 55.178 |
@@ -67,27 +67,27 @@ python -m synthpop experiment --seeds 0,1,2 --seconds 65.0 --restarts 2 --backtr
 | greedy | 1 | True | 500 | 0 | 0 | 0 | 139 | 4.109473 | 53.404 | 200 | 0 | 51.460 |
 | greedy | 2 | True | 500 | 0 | 0 | 0 | 135 | 4.185341 | 51.497 | 200 | 0 | 49.513 |
 
-共享预处理：0.6765 秒（每次实验只执行一次）。
+Shared preprocessing: 0.6765 seconds (performed once per experiment).
 
-- random 成功率：3/3；可行结果 D 均值=137.33333333333334，H 均值=4.046570974754079。
-- greedy 成功率：3/3；可行结果 D 均值=137.33333333333334，H 均值=4.140113744900287。
+- random success rate: 3/3; feasible-only mean D=137.33333333333334, mean H=4.046570974754079.
+- greedy success rate: 3/3; feasible-only mean D=137.33333333333334, mean H=4.140113744900287.
 
-## 完整整数规划对照
+## Full Integer-Programming Control
 
-命令：`python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/full_exact`。
+Command: `python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/full_exact`.
 
-独立验证通过：500 人，729/729 约束满足；D=138，H=3.981021；求解 40.786 秒。求解器达到时间上限但具有可行 incumbent，未证明线性目标最优。此运行没有贪心前缀。
+Independent verification passed: 500 individuals, 729/729 constraints satisfied; D=138, H=3.981021; solve time 40.786 seconds. The solver reached its time limit with a feasible incumbent, without proving linear-objective optimality. This run used no greedy prefix.
 
-## 默认交付结果及限制
+## Default Deliverable and Limitations
 
-默认 results/final 来自 `results/hybrid/greedy_1`，按实验中最高 H 选择：N=500，约束误差全部为 0，D=191，重复人数=309，最大重复次数=24，H=4.717455425 nats。
+The default results/final population comes from `results/hybrid/greedy_1`, selected by the highest observed H: N=500, all constraint errors zero, D=191, duplicate individuals=309, maximum persona multiplicity=24, H=4.717455425 nats.
 
-实验中最大 D 为 193，来自 `results/hybrid/greedy_0`，其 H=4.664782465。D 与 H 分开选择和报告。
+The highest observed D is 193, from `results/hybrid/greedy_0`, with H=4.664782465. D and H are selected and reported separately.
 
-这些均为已观测可行解，没有全局 D 或 H 最优证明。精确补全 status=0 只针对线性代理目标；完整补全或带前缀补全不能证明原始多样性目标最优。
+These are observed feasible solutions, without a global optimality proof for D or H. Exact-completion status=0 applies only to the linear surrogate objective; full completion or completion with a prefix does not prove optimality for the original diversity objectives.
 
-三种子结果只适用于本次参数；不能泛化为算法普遍成功率。纯模式未成功时，不对其部分人口比较可行多样性。混合模式包括精确修复，因此成功不能归因于纯贪心。
+The three-seed results apply only to the recorded parameters and do not establish general algorithm success rates. Incomplete pure-mode populations are excluded from feasible diversity comparisons. Hybrid mode includes exact repair, so its success cannot be attributed to pure greedy construction.
 
-部分实验同时运行，耗时受共享 CPU 竞争影响，适合复现操作记录，不是隔离环境性能基准。时间限制是软限制，求解器退出开销会有小幅超出。未经验证的失败前缀保留在对应运行目录并明确标记 success=false。
+Some experiments ran concurrently and shared CPU resources. The timings document actual execution rather than isolated performance benchmarks. Time limits are soft, and solver shutdown can cause small overruns. Failed prefixes remain in their run directories and are explicitly marked success=false.
 
-7 项 unittest 全部通过；另含局部投影一致但全局不可行的反例测试。所有实验人口在汇总时再从 CSV 重验。
+All 7 unittest tests passed, including a locally consistent but globally infeasible counterexample. Every experiment population is independently rechecked from CSV when this report is generated.

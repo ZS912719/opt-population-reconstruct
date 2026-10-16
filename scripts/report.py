@@ -12,19 +12,19 @@ from synthpop.validate import read_population, verify
 
 def main():
     data = load(ROOT/'data')
-    lines = ['# 实际运行报告', '', '运行日期：2026-10-06。Python 3.12.7，NumPy 1.26.4，SciPy 1.13.1。', '', '通过 HiGHS 的 disp 日志另行核实，当前环境捆绑的 HiGHS 版本为 1.2.0。', '', '数据零目标筛选后有 11,453 个候选，与研究附件第 15 页的活跃 persona 数量一致。数据检查只是必要条件。', '']
+    lines = ['# Recorded Experiment Report', '', 'Experiment date: 2026-10-06. Python 3.12.7, NumPy 1.26.4, SciPy 1.13.1.', '', 'HiGHS diagnostic output, enabled separately with disp, confirmed bundled HiGHS version 1.2.0 in the experiment environment.', '', 'Zero-target filtering retains 11,453 candidates, matching the active persona count on page 15 of the research attachment. Input consistency checks are necessary conditions only.', '']
     feasible = []
     for name in ['pure','hybrid','hybrid_long_calls']:
         folder = ROOT/'results'/name
         if not (folder/'summary.json').exists():
             raise RuntimeError(f'Experiment not complete: {name}')
         summary = json.loads((folder/'summary.json').read_text())
-        lines += [f'## {name}', '', '完整命令：', '', '```powershell']
+        lines += [f'## {name}', '', 'Full command:', '', '```powershell']
         p = summary['parameters']
         command = f"python -m synthpop experiment --seeds {p['seeds']} --seconds {p['seconds']} --restarts {p['restarts']} --backtracks {p['backtracks']} --out results/{name}"
         if p['exact']:
             command += f" --exact --exact-at {p['exact_at']} --exact-seconds {p['exact_seconds']} --rollback {p['rollback']}"
-        lines += [command, '```', '', '| 方法 | 种子 | 成功 | 人数 | 不满足约束 | L1误差 | 最大误差 | D（仅可行） | H（仅可行） | 求解秒 | 撤销人数 | 重启 | 补全秒 |', '|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+        lines += [command, '```', '', '| Method | Seed | Success | Population | Violated constraints | L1 error | Max error | D (feasible only) | H (feasible only) | Solve seconds | Individuals undone | Restarts | Exact seconds |', '|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
         for method in ['random','greedy']:
             for seed in map(int, p['seeds'].split(',')):
                 run = folder/f'{method}_{seed}'
@@ -38,14 +38,14 @@ def main():
                 d = str(m['distinct_personas']) if m['success'] else '-'
                 h = f"{m['shannon_entropy_nats']:.6f}" if m['success'] else '-'
                 lines.append(f"| {method} | {seed} | {m['success']} | {m['population_size']} | {m['violated_constraints']} | {m['total_absolute_error']} | {m['max_absolute_error']} | {d} | {h} | {m['solve_seconds']:.3f} | {m['backtracks']} | {m['restarts']} | {m['exact_seconds']:.3f} |")
-        lines += ['', f"共享预处理：{summary['shared_preprocessing_seconds']:.4f} 秒（每次实验只执行一次）。", '']
+        lines += ['', f"Shared preprocessing: {summary['shared_preprocessing_seconds']:.4f} seconds (performed once per experiment).", '']
         for method, r in summary['results'].items():
-            lines.append(f"- {method} 成功率：{r['successful_runs']}/{r['runs']}；可行结果 D 均值={r['feasible_mean_distinct_personas']}，H 均值={r['feasible_mean_entropy_nats']}。")
+            lines.append(f"- {method} success rate: {r['successful_runs']}/{r['runs']}; feasible-only mean D={r['feasible_mean_distinct_personas']}, mean H={r['feasible_mean_entropy_nats']}.")
         lines += ['']
     full = ROOT/'results/full_exact'
     m = json.loads((full/'metrics.json').read_text())
     assert verify(data,read_population(full/'population.csv',data.k))[1]['success']
-    lines += ['## 完整整数规划对照', '', '命令：`python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/full_exact`。', '', f"独立验证通过：500 人，729/729 约束满足；D={m['distinct_personas']}，H={m['shannon_entropy_nats']:.6f}；求解 {m['solve_seconds']:.3f} 秒。求解器达到时间上限但具有可行 incumbent，未证明线性目标最优。此运行没有贪心前缀。", '']
+    lines += ['## Full Integer-Programming Control', '', 'Command: `python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/full_exact`.', '', f"Independent verification passed: 500 individuals, 729/729 constraints satisfied; D={m['distinct_personas']}, H={m['shannon_entropy_nats']:.6f}; solve time {m['solve_seconds']:.3f} seconds. The solver reached its time limit with a feasible incumbent, without proving linear-objective optimality. This run used no greedy prefix.", '']
     feasible.append((full,m))
     best_h = max(feasible,key=lambda pair:pair[1]['shannon_entropy_nats'])
     best_d = max(feasible,key=lambda pair:pair[1]['distinct_personas'])
@@ -55,7 +55,7 @@ def main():
         shutil.copyfile(best_h[0]/file,final/file)
     (final/'selection.json').write_text(json.dumps({'criterion':'highest observed Shannon entropy among independently verified runs', 'source':str(best_h[0].relative_to(ROOT)), 'max_distinct_personas_source':str(best_d[0].relative_to(ROOT)), 'global_optimality_proven':False},indent=2),encoding='utf-8')
     m = best_h[1]
-    lines += ['## 默认交付结果及限制', '', f"默认 results/final 来自 `{best_h[0].relative_to(ROOT).as_posix()}`，按实验中最高 H 选择：N={m['population_size']}，约束误差全部为 0，D={m['distinct_personas']}，重复人数={m['duplicate_people']}，最大重复次数={m['max_persona_multiplicity']}，H={m['shannon_entropy_nats']:.9f} nats。", '', f"实验中最大 D 为 {best_d[1]['distinct_personas']}，来自 `{best_d[0].relative_to(ROOT).as_posix()}`，其 H={best_d[1]['shannon_entropy_nats']:.9f}。D 与 H 分开选择和报告。", '', '这些均为已观测可行解，没有全局 D 或 H 最优证明。精确补全 status=0 只针对线性代理目标；完整补全或带前缀补全不能证明原始多样性目标最优。', '', '三种子结果只适用于本次参数；不能泛化为算法普遍成功率。纯模式未成功时，不对其部分人口比较可行多样性。混合模式包括精确修复，因此成功不能归因于纯贪心。', '', '部分实验同时运行，耗时受共享 CPU 竞争影响，适合复现操作记录，不是隔离环境性能基准。时间限制是软限制，求解器退出开销会有小幅超出。未经验证的失败前缀保留在对应运行目录并明确标记 success=false。', '', '7 项 unittest 全部通过；另含局部投影一致但全局不可行的反例测试。所有实验人口在汇总时再从 CSV 重验。']
+    lines += ['## Default Deliverable and Limitations', '', f"The default results/final population comes from `{best_h[0].relative_to(ROOT).as_posix()}`, selected by the highest observed H: N={m['population_size']}, all constraint errors zero, D={m['distinct_personas']}, duplicate individuals={m['duplicate_people']}, maximum persona multiplicity={m['max_persona_multiplicity']}, H={m['shannon_entropy_nats']:.9f} nats.", '', f"The highest observed D is {best_d[1]['distinct_personas']}, from `{best_d[0].relative_to(ROOT).as_posix()}`, with H={best_d[1]['shannon_entropy_nats']:.9f}. D and H are selected and reported separately.", '', 'These are observed feasible solutions, without a global optimality proof for D or H. Exact-completion status=0 applies only to the linear surrogate objective; full completion or completion with a prefix does not prove optimality for the original diversity objectives.', '', 'The three-seed results apply only to the recorded parameters and do not establish general algorithm success rates. Incomplete pure-mode populations are excluded from feasible diversity comparisons. Hybrid mode includes exact repair, so its success cannot be attributed to pure greedy construction.', '', 'Some experiments ran concurrently and shared CPU resources. The timings document actual execution rather than isolated performance benchmarks. Time limits are soft, and solver shutdown can cause small overruns. Failed prefixes remain in their run directories and are explicitly marked success=false.', '', 'All 7 unittest tests passed, including a locally consistent but globally infeasible counterexample. Every experiment population is independently rechecked from CSV when this report is generated.']
     (ROOT/'EXPERIMENTS.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     print(json.dumps({'final_source':str(best_h[0]), 'best_entropy':m['shannon_entropy_nats'], 'best_distinct':best_d[1]['distinct_personas']},indent=2))
 

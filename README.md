@@ -1,79 +1,173 @@
-# 合成人口重建（Python）
+# Synthetic Population Reconstruction
 
-输入为 500 人、12 个三分类属性、45 张边缘表、729 个计数约束。输出只是与边缘统计一致的合成人口，**不代表恢复了原始人口**。研究附件中的人格、LLM 和心理特征内容不属于本项目的实现范围。原始人口未提供。
+**English** | [简体中文](README.zh-CN.md)
 
-## 安装及运行
+A Python project for constructing an integer population that exactly matches supplied marginal counts. It combines urgency-based greedy construction, lookahead, bounded backtracking, random restarts, and optional mixed-integer completion. A random legal-candidate baseline provides a comparison.
 
-Python 3.10+。纯模式只依赖 NumPy，精确补全额外依赖 SciPy/HiGHS。
+Matching these marginals produces a compatible synthetic population. **It does not recover the original population**, which is not included in the inputs.
+
+## Problem
+
+Construct exactly **500 individuals**. Each individual has 12 categorical attributes, `A0` through `A11`, with values `v0`, `v1`, or `v2`. A complete assignment is a *persona*, and multiple individuals may share one persona.
+
+The input contains 45 marginal tables: 12 unary, 20 binary, 10 ternary, and 3 four-way tables, totaling **729 count constraints**. Every cell must match its integer target exactly; approximate agreement is not success.
+
+Two diversity measures are reported separately:
+
+- **Distinct personas, D:** the number of different complete attribute assignments.
+- **Shannon entropy, H:** `-sum(p_x * ln(p_x))`, using natural logarithms, where `p_x` is the fraction of individuals with persona x.
+
+Maximizing D and maximizing H are different objectives. The greedy repetition penalty encourages entropy; this implementation does not prove a global optimum for either measure. Personality modeling and LLM-based agents discussed in the research background are outside this project's scope.
+
+## Requirements and installation
+
+Use **Python 3.10 or newer**. NumPy is required; SciPy, with its bundled HiGHS solver, is optional and used only for exact completion. Pure greedy and random modes can run without SciPy. No separate HiGHS installation is required when using the SciPy backend.
+
+Run these commands from the repository root. A virtual environment is recommended:
 
 ```powershell
+python -m venv .venv
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+# Linux/macOS shells: source .venv/bin/activate
 python -m pip install -r requirements.txt
-# 可选
+# Optional exact-completion dependency
 python -m pip install -r requirements-exact.txt
 python -m unittest discover -s tests -v
-python -m synthpop solve --method greedy --seed 0 --seconds 30 --out results/run
-python -m synthpop solve --exact --seconds 60 --exact-at 300 --exact-seconds 8 --backtracks 1000 --rollback 75 --out results/run_exact
-python -m synthpop validate --population results/run_exact/population.csv --out results/checked
-python -m synthpop experiment --seeds 0,1,2 --seconds 12 --out results/pure
-python -m synthpop experiment --seeds 0,1,2 --exact --seconds 60 --exact-at 300 --exact-seconds 8 --backtracks 1000 --rollback 75 --out results/hybrid
 ```
 
-完整精确求解对照（前缀长度为零，因此此命令不衡量贪心的效果）：
+The recorded experiments used Python 3.12.7, NumPy 1.26.4, SciPy 1.13.1, and bundled HiGHS 1.2.0, confirmed separately through solver diagnostic output. To install the recorded Python package versions, use `python -m pip install -r requirements-tested.txt`. Timing and solver behavior can vary across environments and versions.
+
+## Running the project
+
+### Pure greedy or random baseline
 
 ```powershell
-python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/full_exact
+python -m synthpop solve --method greedy --seed 0 --seconds 30 --out results/run
+python -m synthpop solve --method random --seed 0 --seconds 30 --out results/random_run
 ```
 
-`solve` / `validate` 仅在完整独立验证通过时返回退出码 0；失败返回 2。`experiment` 返回 0 表示实验已运行完毕，成功率在汇总中记录。失败目录的 population.csv 是部分人口，不可用于声称满足实例。每次运行建议使用新输出目录。
+For a single random construction without recovery, add `--backtracks 0 --restarts 0`. A pure run may stop with an incomplete population.
 
-## 文件格式和数据检查
+### Greedy construction with exact completion
 
-`data/` 包含附件的两个 CSV 副本，未作修改。CSV 外层分隔符由 csv.Sniffer 从逗号、制表符、分号中检测。实际 scope 为 `A2|A3|A7|A9`，cell 为 `A2=v0;A3=v1;A7=v2;A9=v0`。内部解析独立于 CSV 分隔符。每个表的 scope 属性顺序用于解码，cell 赋值顺序可以不同。
+```powershell
+python -m synthpop solve --method greedy --seed 1 --exact --seconds 60 --exact-at 300 --exact-seconds 8 --backtracks 1000 --rollback 75 --out results/run_exact
+python -m synthpop validate --population results/run_exact/population.csv --out results/checked
+```
 
-加载器检查 ID 唯一、引用存在、合法属性及取值、整数非负 target、arity/num_cells/target_sum 元数据、完整笛卡尔单元格集合、每张表 target 和为 N，以及任意两表在共同属性上的投影一致性。这些是必要条件，**不证明全局可行**。默认实例规模是 k=12,n=500；小型实例可用 `--k` 和 `--n`。
+This is the configuration of the highest-entropy recorded run. A fixed seed controls NumPy random choices; it does not guarantee identical time-limited solver results across machines.
 
-## 模块
+### Multi-seed experiments
 
-| 文件 | 职责 |
+```powershell
+python -m synthpop experiment --seeds 0,1,2 --seconds 12 --out results/new_pure
+python -m synthpop experiment --seeds 0,1,2 --exact --seconds 60 --exact-at 300 --exact-seconds 8 --backtracks 1000 --rollback 75 --out results/new_hybrid
+```
+
+`experiment` runs both methods with the selected seeds and budgets. Use new output directories to preserve recorded results. `solve` and `validate` return exit code 0 only for an independently verified complete population, or 2 on failure. For `experiment`, exit code 0 means the experiment finished; inspect its success rates to determine which runs succeeded. Run `python -m synthpop --help` for all options. The default instance is `--k 12 --n 500`; smaller instances can override these values.
+
+To run a complete integer-programming control without a greedy prefix:
+
+```powershell
+python -m synthpop solve --exact --exact-at 500 --seconds 45 --exact-seconds 40 --out results/new_full_exact
+```
+
+## Input format and checks
+
+The supplied CSV files are copied unchanged into [data/](data/):
+
+| File | Fields |
 |---|---|
-| synthpop/data.py | 读取和必要一致性检查 |
-| synthpop/candidates.py | 全 persona 枚举、零目标排除、匹配和反向索引、可撤销状态 |
-| synthpop/solver.py | 随机基线、贪心、前瞻、有限回退、随机重启 |
-| synthpop/exact.py | 可选整数规划和求解状态分类 |
-| synthpop/validate.py | 从序列化人口重新计算所有边缘计数 |
-| synthpop/__main__.py | 命令行、指标与实验汇总 |
+| `constraint_scopes.csv` | `table_id, arity, scope, num_cells, target_sum` |
+| `constraint_cells.csv` | `cell_id, table_id, arity, scope, cell, target` |
 
-## 贪心及恢复
+CSV delimiters are detected with `csv.Sniffer` from comma, tab, and semicolon. In the supplied files, the outer delimiter is a comma, scopes use `|`, and cell assignments use `;` and `=`. For example, scope `A2|A3` can have cell `A2=v0;A3=v1`. Assignment order may differ from scope order.
 
-每一步重新计算合法候选掩码和不同候选支持数 q。仅匹配的全部 r>0 的 persona 可以加入。选择 r/q 最大的正需求单元格，对其合法支持者评分：需求项为匹配单元格紧迫度之和，除以“表数 × 全部正需求单元格平均紧迫度”；熵增量惩罚 `[(n+1)ln(n+1)-n ln n]/(ln N+1)`。因此 beta=1 时平均需求项约为 1，alpha=1 对最强重复惩罚约为 1。评分按 1e-7 量化并随机打破近似平局。没有另设“不同 persona 数量”的精确目标函数，D 与 H 分别报告。
+The loader checks unique IDs, valid references, attributes and values, nonnegative integer targets, table metadata, complete cell combinations, a total of N in every table, and agreement of overlapping projections. All attributes must be covered. **These are necessary checks, not a proof of global feasibility.** A test includes locally consistent marginals that are globally infeasible.
 
-前瞻每轮最多模拟 `--top` 个候选，检查剩余需求非负及所有正需求仍有合法支持。可用 `--capacity` 增加每个支持候选 `U=min r` 的总容量必要检查。重复合法，所以 r>q 不表示不可行。前瞻和容量检查通过均不证明剩余问题可行。每次失败分支在当前深度禁用；撤销到父节点后清除子层禁用记录。超过时间、总撤销人数预算或重启次数停止。回退指标计数的是撤销个体数（批量撤销也逐人计数）。
+## Algorithm
 
-基线从当前全部合法候选均匀随机选择，不作前瞻、不使用紧迫度或熵评分；发生死路后使用同样的有限回退/重启机制。可指定 `--backtracks 0 --restarts 0` 获得单次无修复基线。混合实验中两个方法使用相同预算和精确补全策略。
+### 1. Candidate preprocessing
 
-## 精确补全
+Enumerate all `3^12 = 531,441` personas and remove any matching a zero-target cell. This instance retains **11,453 candidates**. Precompute each candidate's matching cell in every table and build a cell-to-candidate reverse index.
 
-对当前合法候选建立非负整数 z，729 行等式为 `M z = r`，变量上界为 `min r`。线性代价为当前重复次数加随机微扰，是重复偏好的启发式，**不等于 Shannon 熵或 D 的精确优化**。剩余人数达到 `--exact-at` 或出现死路时启动。只有返回整数解且矩阵等式精确重验通过时才接受；最终仍需独立 CSV 验证。仅 `status=2` 表示该前缀剩余问题证明不可行，此时按 `--rollback` 批量撤销继续尝试。超时/未知不当作不可行，不据此执行批量不可行恢复；仍可继续普通贪心和死路修复。
+The persistent attribute matrix, matching matrix, reverse offsets, and reverse candidate IDs occupy **3,235,586 bytes, about 3.09 MiB**. Enumeration uses additional temporary arrays; an int64 broadcast intermediate alone is about 48.66 MiB. Solver matrices and internal solver storage require further memory. These are array-size estimates, not measured peak process memory.
 
-SciPy status=0 仅证明其线性代理目标最优，**不证明多样性或熵最优**；status=1 是达到限制，可能有可行 incumbent。记录原始状态、消息、可行 incumbent 标志及 SciPy 版本；HiGHS 版本不通过公共 SciPy API 暴露。本次另行运行 `milp(..., options={'disp':True})`，日志确认 HiGHS 1.2.0。接口参考：https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html 。实际测试环境 Python 3.12.7、NumPy 1.26.4、SciPy 1.13.1；精确版本列在 requirements-tested.txt。
+### 2. Greedy selection
 
-时间预算是软墙钟限制：Python 在每轮检查截止时间，求解器获得剩余预算；原生求解器清理、启动和一次数组扫描可能造成少量超时。不是操作系统硬终止保证。预处理不计入求解预算。
+Maintain remaining cell demand `r_c`, selected persona counts `n_x`, and the selected population. A candidate is legal only if every cell it matches has positive remaining demand. Adding one individual subtracts one from its matching cell in each table.
 
-## 内存
+Let `q_c` be the number of distinct currently legal candidates supporting cell c. For positive remaining demand, urgency is `u_c = r_c / q_c`. Positive demand with no support triggers recovery. Since repetitions are allowed, **r_c > q_c is not an infeasibility test**.
 
-枚举 531,441 个 persona 后，零目标排除剩 11,453 个。持久数组：
+Choose a most urgent positive-demand cell, then rank its legal supporters using:
 
-| 数组 | dtype / 大小 | 字节 |
-|---|---|---:|
-| persona 属性 | uint8 / 11453×12 | 137436 |
-| 匹配单元格 | uint16 / 11453×45 | 1030770 |
-| 反向索引 offset | int64 / 730 | 5840 |
-| 反向索引候选 ID | int32 / 515385 | 2061540 |
+```text
+S(x) = beta * sum(u_c matched by x) / demand_scale
+       - alpha * [(n_x + 1) ln(n_x + 1) - n_x ln(n_x)] / (ln(N) + 1)
+```
 
-合计 3,235,586 字节，约 3.09 MiB。状态 r 为 729 个 int64，persona 次数为 11,453 个 int64。初始属性矩阵约 6.08 MiB；枚举中广播 int64 临时数组约 48.66 MiB，筛选和排序还产生副本。精确补全 CSC 数据、行号、列偏移约额外 6 MiB 起，求解器内部内存可能更高。表格是数组字节数，**不是实测进程峰值内存**。
+Here `0 ln(0) = 0`, and `demand_scale` is the number of tables times the mean urgency over all positive-demand cells. This gives a typical demand score near one and a maximum repetition penalty near one, making alpha and beta comparable weights. Scores are quantized at `1e-7`, with random tie-breaking. The repetition increment corresponds to the entropy objective at fixed final N; it is not a separate exact optimization of D.
 
-## 输出与实验解读
+### 3. Lookahead and bounded recovery
 
-每个运行目录包含 population.csv（每行一个人、A0–A11）、validation.csv（每个 cell 的 target/actual/difference）、metrics.json（数量、误差、D、重复人数、最大重复次数、自然对数 H、时长、种子、参数、回退和重启次数、补全日志、终止状态）。运行先写 population.csv，再读回来独立计数，完全不依赖候选匹配缓存或求解器剩余计数。实验额外输出 summary.csv、summary.json，只对成功运行计算 D/H 均值；无成功结果则为 null。
+Simulate up to `--top` ranked candidates per round. Reject a trial if it creates negative demand or leaves any positive-demand cell without legal support. With `--capacity`, also require the sum of supporting candidate bounds `U_x = min(r_c matched by x)` to cover each cell's remaining demand. Passing these checks does not establish residual feasibility.
 
-有限种子成功率只是给定参数、环境和预算下的观测，不是普遍成功概率。H 与 D 是不同指标：相同 D 下，重复次数分配不同会改变 H。没有进行全局多样性或熵最优求解，也不能通过这些边缘约束验证真实人口或未观测行为。实际运行结果见 EXPERIMENTS.md。`python scripts/report.py` 可从三组已完成实验重新验证、生成报告并选择已观测 H 最高的可行运行作为 results/final；选择记录写入 selection.json。该脚本针对本项目交付的实验目录组织。
+State updates are reversible. Failed choices are banned at the current search depth; child-depth bans are cleared when backing up. Wall-clock, backtracking, and restart budgets bound the search. The backtracking count measures individuals undone, including batch rollback, and excludes lookahead simulations.
+
+The baseline samples uniformly from all currently legal candidates. It does not use urgency, repetition scoring, or lookahead, but can use the same recovery and optional exact-completion settings.
+
+### 4. Optional exact completion
+
+For every legal candidate, introduce a nonnegative integer variable `z_x` with upper bound `min(r_c matched by x)`, and impose `M z = r` for every cell. Completion starts at `--exact-at` remaining individuals or at a dead end. Its linear cost is the current persona count plus a small random perturbation: a repetition preference, **not an exact entropy or distinct-persona objective**.
+
+Only a solver proof of residual infeasibility triggers batch rollback of up to `--rollback` individuals. A timeout or unknown status is not treated as infeasibility; ordinary greedy search and dead-end recovery may continue. A time-limited call may still provide a feasible incumbent, which is accepted only after integer and equality checks.
+
+SciPy status 0 proves optimality only for this linear surrogate; status 1 indicates a limit, and status 2 indicates infeasibility. Raw statuses and messages are recorded. Final success always requires independent verification of the saved CSV. See the [SciPy MILP interface](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html).
+
+Time limits are soft: preprocessing is separate, and native solver startup, shutdown, or an array operation can cause a small overrun.
+
+## Outputs and verification
+
+| Output | Contents |
+|---|---|
+| `population.csv` | One individual per row, with attributes `A0` through `A11` |
+| `validation.csv` | Every constraint's target, actual count, and difference |
+| `metrics.json` | Population size, errors, D, duplicates, maximum multiplicity, H, timings, budgets, seed, recovery counts, and termination status |
+| `summary.csv` / `summary.json` | Multi-seed results and feasible-only diversity averages |
+
+The verifier reads the saved population and recounts all marginals directly from attribute rows, without candidate lookup caches or solver residual counts. Incomplete or invalid populations remain explicitly unsuccessful. Diversity averages include only verified feasible runs; if none succeeded, the averages are null.
+
+The default delivered population is in [results/final/](results/final/). It has **500 individuals, 729/729 exact constraints, D=191, 309 duplicate individuals, maximum multiplicity 24, and H=4.717455 nats**. Every count error is zero. The recorded maximum D is **193**, with H=4.664782, from a different run.
+
+## Difficulties encountered and recorded results
+
+1. **Local consistency does not ensure a feasible completion.** Pure runs exhausted recovery or time budgets despite valid inputs. Greedy prefixes can block all global completions; lookahead catches only some such failures.
+2. **Short exact calls often end without a decision.** Eight-second completion calls sometimes timed out. The implementation preserves the distinction between proven infeasibility, unknown status, and a verified feasible incumbent.
+3. **Recovery choices change the result.** Rolling back a shorter prefix preserves more greedy decisions; rolling back the whole prefix can turn the run into a full integer-programming solve and lose the greedy diversity benefit. Longer calls are not automatically better for diversity.
+4. **D and H select different runs.** The observed maximum-D run is different from the maximum-H run. The linear completion objective also differs from both measures, so solver optimality does not settle either diversity objective.
+5. **Performance comparisons need context.** Some experiments ran concurrently and shared CPU resources. The timings are recorded execution evidence, not an isolated performance benchmark; three seeds do not establish general success probabilities.
+
+| Recorded configuration | Random success | Greedy success |
+|---|---:|---:|
+| Pure; 12-second solve budget | 0/3 | 0/3 |
+| Hybrid; 60 seconds, 8-second exact calls, rollback 75 | 0/3 | 3/3 |
+| Hybrid; 65 seconds, 55-second exact calls, rollback 500 | 3/3 | 3/3 |
+
+In the main hybrid experiment, feasible greedy results averaged D=191.333333 and H=4.673141. With longer calls and full rollback, both methods averaged D=137.333333; random H averaged 4.046571 and greedy H averaged 4.140114. No global diversity or entropy optimum is claimed.
+
+Full commands, per-seed metrics, and limitations are preserved in [EXPERIMENTS.md](EXPERIMENTS.md), currently in Chinese, and the machine-readable summaries under [results/](results/). `python scripts/report.py` rechecks the three recorded experiment groups, regenerates that report, and selects the observed highest-entropy feasible run for `results/final/`. It expects the delivered directory layout and updates those report and selection artifacts.
+
+## Project layout and contribution language
+
+| Module | Responsibility |
+|---|---|
+| `synthpop/data.py` | CSV loading and necessary consistency checks |
+| `synthpop/candidates.py` | Enumeration, zero filtering, indexes, reversible state |
+| `synthpop/solver.py` | Random baseline, greedy scoring, lookahead, recovery |
+| `synthpop/exact.py` | Optional integer completion and solver status handling |
+| `synthpop/validate.py` | Independent population recount and CSV output |
+| `synthpop/__main__.py` | CLI, metrics, and experiments |
+| `tests/test_project.py` | Parsing, zero exclusion, state restoration, known feasible/infeasible cases, repeated personas, and optional exact completion |
+
+All commit messages, code comments, and docstrings must be written in **English**. Documentation may have separate language editions. See [CONTRIBUTING.md](CONTRIBUTING.md).
